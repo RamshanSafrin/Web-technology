@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Job Application Form</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #eaf2f8;
+    padding: 20px;
+}
+
+form {
+    background: white;
+    padding: 20px;
+    max-width: 800px;
+    margin: auto;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+h2 {
+    margin-top: 20px;
+    background-color: #485f76;
+    color: white;
+    padding: 8px;
+    border-radius: 4px;
+}
+
+label {
+    display: block;
+    margin-top: 15px;
+    font-weight: 600;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 10px 12px;
+    margin-top: 6px;
+    margin-bottom: 12px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+input.valid {
+    border: 2px solid green;
+}
+
+input.invalid, textarea.invalid {
+    border: 2px solid red;
+}
+
+.error {
+    color: red;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.counter {
+    font-size: 12px;
+    text-align: right;
+}
+
+button {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #1e4d6c;
+}
+
+.remove-btn {
+    background-color: #bdc3c7;
+    color: black;
+    border-radius: 4px;
+    padding: 6px 10px;
+}
+
+.remove-btn:hover {
+    background-color: #e74c3c;
+    color: white;
+}
+</style>
+</head>
+
+<body>
+
+<form id="jobForm">
+
+<h2>Personal Details</h2>
+
+<label>Name <span style="color:red">*</span></label>
+<input type="text" id="name">
+<span class="error" id="nameError"></span>
+
+<label>Email <span style="color:red">*</span></label>
+<input type="email" id="email">
+<span class="error" id="emailError"></span>
+
+<label>Phone <span style="color:red">*</span></label>
+<input type="text" id="phone">
+<span class="error" id="phoneError"></span>
+
+<h2>Education</h2>
+<div id="educationSection"></div>
+<button type="button" onclick="addEducation()">Add Education</button>
+
+<h2>Work Experience</h2>
+<div id="experienceSection"></div>
+<button type="button" onclick="addExperience()">Add Experience</button>
+
+<h2>Resume Upload</h2>
+<input type="file" id="resume">
+<span class="error" id="resumeError"></span>
+
+<h2>Skills / Cover Letter</h2>
+<textarea id="skills" maxlength="200"></textarea>
+<div class="counter" id="charCount">0 / 200</div>
+
+<br>
+<button type="submit">Submit Application</button>
+
+</form>
+
+<script>
+const form = document.getElementById("jobForm");
+
+// Character Counter
+const skills = document.getElementById("skills");
+skills.addEventListener("input", () => {
+    document.getElementById("charCount").innerText =
+        skills.value.length + " / 200";
+});
+
+// Add Education
+function addEducation() {
+    const div = document.createElement("div");
+    div.innerHTML = `
+        <label>Degree <span style="color:red">*</span></label>
+        <input type="text" required>
+
+        <label>Start Date <span style="color:red">*</span></label>
+        <input type="date" required>
+
+        <label>End Date <span style="color:red">*</span></label>
+        <input type="date" required>
+
+        <button type="button" class="remove-btn"
+        onclick="this.parentElement.remove()">Remove</button>
+        <hr>
+    `;
+    document.getElementById("educationSection").appendChild(div);
+}
+
+// Add Experience
+function addExperience() {
+    const div = document.createElement("div");
+    div.innerHTML = `
+        <label>Company <span style="color:red">*</span></label>
+        <input type="text" required>
+
+        <label>Start Date <span style="color:red">*</span></label>
+        <input type="date" required>
+
+        <label>End Date <span style="color:red">*</span></label>
+        <input type="date" required>
+
+        <button type="button" class="remove-btn"
+        onclick="this.parentElement.remove()">Remove</button>
+        <hr>
+    `;
+    document.getElementById("experienceSection").appendChild(div);
+}
+
+// Date Validation Function
+function validateDates(sectionId) {
+    const sections = document.querySelectorAll(`#${sectionId} > div`);
+
+    for (let sec of sections) {
+        const dates = sec.querySelectorAll("input[type='date']");
+        if (dates.length === 2) {
+            const start = new Date(dates[0].value);
+            const end = new Date(dates[1].value);
+
+            if (dates[0].value && dates[1].value && start >= end) {
+                alert("Start date must be before End date");
+                dates[0].classList.add("invalid");
+                dates[1].classList.add("invalid");
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+// Form Validation
+form.addEventListener("submit", function(e) {
+    e.preventDefault();
+    let valid = true;
+
+    // Name
+    const name = document.getElementById("name");
+    if (name.value === "") {
+        name.classList.add("invalid");
+        document.getElementById("nameError").innerText = "Name is required";
+        valid = false;
+    } else {
+        name.classList.add("valid");
+    }
+
+    // Email
+    const email = document.getElementById("email");
+    const emailPattern = /^[^ ]+@[^ ]+\.[a-z]{2,3}$/;
+    if (!emailPattern.test(email.value)) {
+        email.classList.add("invalid");
+        document.getElementById("emailError").innerText = "Invalid email format";
+        valid = false;
+    } else {
+        email.classList.add("valid");
+    }
+
+    // Phone
+    const phone = document.getElementById("phone");
+    if (phone.value.length !== 10) {
+        phone.classList.add("invalid");
+        document.getElementById("phoneError").innerText = "Enter 10 digit number";
+        valid = false;
+    } else {
+        phone.classList.add("valid");
+    }
+
+    // Resume
+    const resume = document.getElementById("resume");
+    if (resume.files.length === 0) {
+        document.getElementById("resumeError").innerText = "Resume required";
+        valid = false;
+    } else {
+        const file = resume.files[0];
+        const allowed = [
+            "application/pdf",
+            "application/msword",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        ];
+
+        if (!allowed.includes(file.type) || file.size > 2 * 1024 * 1024) {
+            document.getElementById("resumeError").innerText =
+                "Only PDF/DOC (max 2MB)";
+            valid = false;
+        }
+    }
+
+    // Chronological Validation
+    if (!validateDates("educationSection")) valid = false;
+    if (!validateDates("experienceSection")) valid = false;
+
+    if (valid) {
+        alert("Application Submitted Successfully!");
+        form.reset();
+    }
+});
+</script>
+
+</body>
+</html>
